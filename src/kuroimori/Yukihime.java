@@ -24,7 +24,7 @@ public class Yukihime extends AdvancedRobot {
 	private int target = 1;
 
 	/**
-	 * @brief Setup every variable for a map overview
+	 * Setup every variable for a map overview
 	 */
 	public void setup()
 	{
@@ -43,7 +43,8 @@ public class Yukihime extends AdvancedRobot {
 	}
 
 	/**
-	 * @brief Get Relative Position (Vector) of an Enemy by (sin a, cos a) * |w|
+	 * Get Relative Position (Vector) of an Enemy by (sin a, cos a) * |w|
+	 * 
 	 * @param enemy
 	 * @return coordiantes of enemy
 	 */
@@ -60,7 +61,8 @@ public class Yukihime extends AdvancedRobot {
 		return coordinates;
 	}
 	/**
-	 * @brief Get Absolute Position by Relative
+	 * Get Absolute Position by Relative
+	 * 
 	 * @param enemy
 	 * @return coordinates
 	 */
@@ -74,8 +76,9 @@ public class Yukihime extends AdvancedRobot {
 	}
 
 	/**
-	 * @brief True if scanned enemy is moving
+	 * True if scanned enemy is moving
 	 * Attention! scanning is done outside!
+	 * 
 	 * @param enemy - Scanned enemy
 	 * @return state
 	 */
@@ -110,7 +113,8 @@ public class Yukihime extends AdvancedRobot {
 	}
 
 	/**
-	 * @brief Move in a "stairy" way...
+	 * Move in a "stairy" way...
+	 * 
 	 * @param coordinates
 	 */
 	public void angleMoveTo(double[] coordinates)
