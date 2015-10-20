@@ -4,6 +4,8 @@ import java.util.Random;
 
 import robocode.AdvancedRobot;
 import robocode.ScannedRobotEvent;
+import robocode.HitByBulletEvent;
+
 import static robocode.util.Utils.*;
 
 public class Yukihime extends AdvancedRobot {
@@ -11,7 +13,7 @@ public class Yukihime extends AdvancedRobot {
 	private double[] enemypos;
 	//Stair Steps
 	private final int steps = 2;
-	
+
 	//0 = Standby
 	//1 = Enemy
 	//2 = Mappoint
@@ -25,7 +27,7 @@ public class Yukihime extends AdvancedRobot {
 		setAdjustGunForRobotTurn(true);
 		setAdjustRadarForGunTurn(true);
 		setAdjustRadarForRobotTurn(true);
-		
+
 		//Scan Enviorment (360°)
 		turnRadarRight(360);
 
@@ -34,22 +36,22 @@ public class Yukihime extends AdvancedRobot {
 		//Execute everything
 		execute();
 	}
-	
+
 	/**
 	 * @brief Get Relative Position (Vector) of an Enemy by (sin a, cos a) * |w|
 	 * @param enemy
 	 * @return coordiantes of enemy
 	 */
 	public double[] getRelativePosition(ScannedRobotEvent enemy)
-	{		
+	{
 		double distance = enemy.getDistance();
 		double bearing =  enemy.getBearingRadians();
-		
+
 		double vectorXEnemy = Math.sin(bearing + getHeadingRadians()) * distance;
 		double vectorYEnemy = Math.cos(bearing + getHeadingRadians()) * distance;
-		
+
 		double[] coordinates = {vectorXEnemy, vectorYEnemy};
-		
+
 		return coordinates;
 	}
 	/**
@@ -64,7 +66,7 @@ public class Yukihime extends AdvancedRobot {
 		coordinates[1] = coordinates[1] - getY();
 		return coordinates;
 	}
-	
+
 	/**
 	 * @brief Move in a "stairy" way...
 	 * @param coordinates
@@ -74,8 +76,8 @@ public class Yukihime extends AdvancedRobot {
 		//TODO: Check if nessecary
 		//Turn to North
 		//turnRight(normalRelativeAngleDegrees(0 - getHeading()));
-		
-		
+
+
 		for(int i=0;i<steps;i++)
 		{
 			ahead(coordinates[1]/steps);
@@ -84,15 +86,15 @@ public class Yukihime extends AdvancedRobot {
 			setTurnLeft(90);
 		}
 	}
-	
+
 	public void shootEnemy()
 	{
-		
+
 	}
-	
-	public void run() 
+
+	public void run()
 	{
-		setup();	
+		setup();
 		angleMoveTo(enemypos);
 		while(true)
 		{
@@ -102,7 +104,7 @@ public class Yukihime extends AdvancedRobot {
 			angleMoveTo(enemypos);
 		}
 	}
-	
+
 	/**
 	 * @brief Move to Enemy
 	 */
@@ -111,15 +113,15 @@ public class Yukihime extends AdvancedRobot {
 		enemypos = getRelativePosition(e);
 		out.println(enemypos[0] + ", " + enemypos[1]);
 	}
-	
-	public void onHitByBullet(HitByBulletEvent event) 
+
+	public void onHitByBullet(HitByBulletEvent event)
 	{
 		target = 2;
-		
-		Random rand = new java.util.Random();
+
+		Random rand = new Random();
 		enemypos[0] = (double)rand.nextInt((int)getBattleFieldHeight());
 		enemypos[1] = (double)rand.nextInt((int)getBattleFieldWidth());
-		
+
 	}
-	
+
 }
