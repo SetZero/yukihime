@@ -1,6 +1,7 @@
 package kuroimori;
 
 import java.util.Random;
+import static java.lang.Math.*;
 
 import robocode.AdvancedRobot;
 import robocode.ScannedRobotEvent;
@@ -10,7 +11,10 @@ import static robocode.util.Utils.*;
 
 public class Yukihime extends AdvancedRobot {
 
+	/* TODO: enemypos -> relativeEnemeyPos */
 	private double[] enemypos;
+
+	private double[] prevEnemyPos = {-1, -1};
 	//Stair Steps
 	private final int steps = 2;
 
@@ -48,8 +52,8 @@ public class Yukihime extends AdvancedRobot {
 		double distance = enemy.getDistance();
 		double bearing =  enemy.getBearingRadians();
 
-		double vectorXEnemy = Math.sin(bearing + getHeadingRadians()) * distance;
-		double vectorYEnemy = Math.cos(bearing + getHeadingRadians()) * distance;
+		double vectorXEnemy = sin(bearing + getHeadingRadians()) * distance;
+		double vectorYEnemy = cos(bearing + getHeadingRadians()) * distance;
 
 		double[] coordinates = {vectorXEnemy, vectorYEnemy};
 
@@ -67,6 +71,42 @@ public class Yukihime extends AdvancedRobot {
 		coordinates[1] = coordinates[1] + getY();
 
 		return coordinates;
+	}
+
+	/**
+	 * @brief True if scanned enemy is moving
+	 * Attention! scanning is done outside!
+	 * @param enemy - Scanned enemy
+	 * @return state
+	 */
+	public boolean isMoving(double[] enemyPos)
+	{
+		/* Convert to long for better comparing */
+		long prevX = round(prevEnemyPos[0]);
+		long prevY = round(prevEnemyPos[1]);
+		long enemX = round(enemyPos[0]);
+		long enemY = round(enemyPos[1]);
+
+		out.println(enemX);
+
+		if (prevX < 0 || prevY < 0) {
+
+			prevEnemyPos = enemyPos;
+			return false;
+
+		} else if ( prevX != enemX || prevY != enemY ) {
+
+			prevEnemyPos = enemyPos;
+			return true;
+
+		} else if (prevX == enemX && prevY == enemY) {
+
+			return false;
+		} else {
+
+			out.println("Error in isMoving");
+			return false;
+		}
 	}
 
 	/**
@@ -114,8 +154,7 @@ public class Yukihime extends AdvancedRobot {
 	{
 		enemypos = getRelativePosition(e);
 
-		double[] enemyAbsolutePosition = getAbsolutePosition(e);
-		out.println(enemyAbsolutePosition[0] + ", " + enemyAbsolutePosition[1]);
+		out.println("Eneymy is moving: " + isMoving(getAbsolutePosition(e)));
 	}
 
 	public void onHitByBullet(HitByBulletEvent event)
