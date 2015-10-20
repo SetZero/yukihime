@@ -18,6 +18,7 @@ public class Yukihime extends AdvancedRobot {
 	//1 = Enemy
 	//2 = Mappoint
 	private int target = 1;
+
 	/**
 	 * @brief Setup every variable for a map overview
 	 */
@@ -62,8 +63,9 @@ public class Yukihime extends AdvancedRobot {
 	public double[] getAbsolutePosition(ScannedRobotEvent enemy)
 	{
 		double[] coordinates = getRelativePosition(enemy);
-		coordinates[0] = coordinates[0] - getX();
-		coordinates[1] = coordinates[1] - getY();
+		coordinates[0] = coordinates[0] + getX();
+		coordinates[1] = coordinates[1] + getY();
+
 		return coordinates;
 	}
 
@@ -111,7 +113,9 @@ public class Yukihime extends AdvancedRobot {
 	public void onScannedRobot(ScannedRobotEvent e)
 	{
 		enemypos = getRelativePosition(e);
-		out.println(enemypos[0] + ", " + enemypos[1]);
+
+		double[] enemyAbsolutePosition = getAbsolutePosition(e);
+		out.println(enemyAbsolutePosition[0] + ", " + enemyAbsolutePosition[1]);
 	}
 
 	public void onHitByBullet(HitByBulletEvent event)
