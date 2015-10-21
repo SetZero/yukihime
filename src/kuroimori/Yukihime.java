@@ -7,6 +7,7 @@ import static java.lang.Math.*;
 import robocode.AdvancedRobot;
 import robocode.ScannedRobotEvent;
 import robocode.HitByBulletEvent;
+import robocode.util.Utils;
 
 import static robocode.util.Utils.*;
 
@@ -32,7 +33,7 @@ public class Yukihime extends AdvancedRobot {
 		setAdjustRadarForRobotTurn(true);
 
 		//Scan Enviorment (360°)
-		turnRadarRight(360);
+		//turnRadarRight(360);
 
 		//turn to north
 		turnRight(normalRelativeAngleDegrees(0 - getHeading()));
@@ -203,11 +204,13 @@ public class Yukihime extends AdvancedRobot {
 	{
 		//FIXME: Change Back to normal
 		setup();
+		turnRadarRightRadians(Double.POSITIVE_INFINITY);
 		angleMoveTo(enemypos);
 		while(true)
 		{
+			scan();
 			//Scan Enviorment (360°)
-			setTurnRadarRight(360);
+			//setTurnRadarRight(360);
 			//FIXME: Set Radar on Opponent
 			execute();
 			angleMoveTo(enemypos);
@@ -219,12 +222,16 @@ public class Yukihime extends AdvancedRobot {
 	 */
 	public void onScannedRobot(ScannedRobotEvent e)
 	{
+		double radarTurn = getHeadingRadians() + e.getBearingRadians() - getRadarHeadingRadians();
+		 
+		setTurnRadarRightRadians(Utils.normalRelativeAngle(radarTurn));
+		
 		enemypos = getRelativePosition(e);
-
-		out.println("Eneymy is moving: " + isMoving(getAbsolutePosition(e)));
+		
+		//out.println("Eneymy is moving: " + isMoving(getAbsolutePosition(e)));
 		if(getEnergy() > 50)
 		{
-			enemyTarget = shootEnemy(e);
+			//enemyTarget = shootEnemy(e);
 		}
 	}
 
