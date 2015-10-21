@@ -138,7 +138,6 @@ public class Yukihime extends AdvancedRobot {
 	{
 		double bulletStrength = 1;
 		double bulletVelocity = 20 - 3 * bulletStrength; 
-		double gundiff = getGunHeadingRadians() - getHeadingRadians();
 		double enemydis = e.getDistance();
 
 		
@@ -155,18 +154,18 @@ public class Yukihime extends AdvancedRobot {
 		double newenemyx = enemyPos[0]+(timeConsume*velocity_x);
 		double newenemyy = enemyPos[1]+(timeConsume*velocity_y);
 		
-		if(newenemyx > getBattleFieldHeight())
+		if(newenemyx > getBattleFieldWidth())
 		{
-			newenemyx = getBattleFieldHeight();
+			newenemyx = getBattleFieldWidth();
 		}
 		else if(newenemyx < 0)
 		{
 			newenemyx = 0;
 		}
 		
-		if(newenemyy > getBattleFieldWidth())
+		if(newenemyy > getBattleFieldHeight())
 		{
-			newenemyy = getBattleFieldWidth();
+			newenemyy = getBattleFieldHeight();
 		}
 		else if(newenemyy < 0)
 		{
@@ -174,17 +173,19 @@ public class Yukihime extends AdvancedRobot {
 		}
 		
 		//Turn myself by -> Change to turn gun to [tan((getX() - newenemyx) / (getY() - newenemyy))]
-		double turn = normalRelativeAngle(gundiff + tan((getX() - newenemyx) / (getY() - newenemyy)));
+		double turn = normalRelativeAngle(atan2((getX() - newenemyx), (getY() - newenemyy)) - getGunHeadingRadians() - PI);
 		out.println("TurnBy: " + turn);
-		setTurnGunLeftRadians(getGunHeadingRadians() - turn);
-		setFire(bulletStrength);
+		turnGunRightRadians(turn);
+		execute();
+		fire(bulletStrength);
+		execute();
 		
 		double[] newpos = {newenemyx, newenemyy};  
 
 		//setTurnRadarRight(360);
 		return newpos;
 	}
-
+	
 	public void run()
 	{
 		//FIXME: Change Back to normal
@@ -193,7 +194,8 @@ public class Yukihime extends AdvancedRobot {
 		while(true)
 		{
 			//Scan Enviorment (360°)
-			setTurnRadarRight(360);
+			//setTurnRadarRight(360);
+			//FIXME: Set Radar on Opponent
 			execute();
 			//angleMoveTo(enemypos);
 		}
