@@ -125,14 +125,27 @@ public class Yukihime extends AdvancedRobot {
 		for(int i=0;i<steps;i++)
 		{
 			ahead(coordinates[1]/steps);
-			setTurnRight(90);
+			turnRight(90);
 			ahead(coordinates[0]/steps);
-			setTurnLeft(90);
+			turnLeft(90);
 		}
 	}
 	
 	/**
-	 * 
+	 * Allways tries to locate an enemy on the Map
+	 * @param e
+	 */
+	public void turnRadarToEnemy(ScannedRobotEvent e)
+	{
+		double currradar = getRadarHeadingRadians(); 
+		setTurnRadarRightRadians(0);
+	}
+	
+	
+	/**
+	 * Finds an Enemy and tries to shoot at hime while he is moving
+	 * @param e Enemy Scanned Obj
+	 * @return Enemy Shooting Position
 	 */
 	public double[] shootEnemy(ScannedRobotEvent e)
 	{
@@ -190,14 +203,14 @@ public class Yukihime extends AdvancedRobot {
 	{
 		//FIXME: Change Back to normal
 		setup();
-		//angleMoveTo(enemypos);
+		angleMoveTo(enemypos);
 		while(true)
 		{
 			//Scan Enviorment (360°)
-			//setTurnRadarRight(360);
+			setTurnRadarRight(360);
 			//FIXME: Set Radar on Opponent
 			execute();
-			//angleMoveTo(enemypos);
+			angleMoveTo(enemypos);
 		}
 	}
 
@@ -209,7 +222,10 @@ public class Yukihime extends AdvancedRobot {
 		enemypos = getRelativePosition(e);
 
 		out.println("Eneymy is moving: " + isMoving(getAbsolutePosition(e)));
-		enemyTarget = shootEnemy(e);
+		if(getEnergy() > 50)
+		{
+			enemyTarget = shootEnemy(e);
+		}
 	}
 
 	public void onHitByBullet(HitByBulletEvent event)
