@@ -22,7 +22,12 @@ public class Yukihime extends AdvancedRobot {
 
 	private double[] enemyTarget;
 	private int enemycountercampshots = 10;
-	private double bulletStrength = 1;
+	private double bulletStrength = 1.01;
+	public double eenergy;
+	public double FORWARD = 10;
+	public int firetime = 0;
+	private int wallMargin = 60; 
+	
 
 	/**
 	 * Setup every variable for a map overview
@@ -206,10 +211,11 @@ public class Yukihime extends AdvancedRobot {
 		//Full Enviorment Scan
 		turnRadarRightRadians(Double.POSITIVE_INFINITY);
 		angleMoveTo(enemypos);
+		
 		while(true)
 		{
-			execute();
 			angleMoveTo(enemypos);
+			execute();
 		}
 	}
 
@@ -224,20 +230,55 @@ public class Yukihime extends AdvancedRobot {
 		
 		enemypos = getRelativePosition(e);
 		
+		if(getEnergy() < 99)
+		{
+			if((getX() <= wallMargin ||
+				 getX() >= getBattleFieldWidth() - wallMargin ||
+				 getY() <= wallMargin ||
+				 getY() >= getBattleFieldHeight() - wallMargin)
+				)
+				{
+					FORWARD = -FORWARD; 	
+					setAhead(FORWARD*wallMargin);
+				}
+			double b;
+			b = eenergy - e.getEnergy(); 
+			eenergy = e.getEnergy();
+			//MOVE
+			if (b > 0 && b <= 3) { 
+			 	firetime = (int) (10+2*b);
+			 	setMaxVelocity(8);
+			 	if (Math.random() < 0.5) FORWARD = -FORWARD; 
+				setAhead(185 * FORWARD); 
+			}
+			if (getDistanceRemaining() == 0) { FORWARD = -FORWARD; setAhead(185 * FORWARD); }
+			if (--firetime == 3 && Math.random() <0.5) setMaxVelocity(4); 
+			setTurnRightRadians(e.getBearingRadians() + Math.PI/2 - 0.5236 * FORWARD * (e.getDistance() > 200 ? 1 : -1));
+		}
+		
 		//out.println("Eneymy is moving: " + isMoving(getAbsolutePosition(e)));
 		if(getEnergy() > 25 || e.getEnergy() < getEnergy())
 		{
+			
 			if(!isMoving(getAbsolutePosition(e)))
 			{
 				bulletStrength = 3;
-				for(int i=0;i<enemycountercampshots;i++)
+				//MAX Damage
+				if(e.getEnergy() < 16)
 				{
 					shootEnemy(e);
+				}
+				else
+				{
+					for(int i=0;i<enemycountercampshots;i++)
+					{
+						shootEnemy(e);
+					}
 				}
 			}
 			else
 			{
-				bulletStrength = 1;
+				bulletStrength = 1.01;
 			}
 			enemyTarget = shootEnemy(e);
 		}
