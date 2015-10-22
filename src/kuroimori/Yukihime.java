@@ -189,10 +189,8 @@ public class Yukihime extends AdvancedRobot {
 		//Turn myself by -> Change to turn gun to [tan((getX() - newenemyx) / (getY() - newenemyy))]
 		double turn = normalRelativeAngle(atan2((getX() - newenemyx), (getY() - newenemyy)) - getGunHeadingRadians() - PI);
 		out.println("TurnBy: " + turn);
-		turnGunRightRadians(turn);
-		execute();
-		fire(bulletStrength);
-		execute();
+		setTurnGunRightRadians(turn);
+		setFire(bulletStrength);
 		
 		double[] newpos = {newenemyx, newenemyy};  
 
@@ -204,14 +202,11 @@ public class Yukihime extends AdvancedRobot {
 	{
 		//FIXME: Change Back to normal
 		setup();
+		//Full Enviorment Scan
 		turnRadarRightRadians(Double.POSITIVE_INFINITY);
 		angleMoveTo(enemypos);
 		while(true)
 		{
-			scan();
-			//Scan Enviorment (360°)
-			//setTurnRadarRight(360);
-			//FIXME: Set Radar on Opponent
 			execute();
 			angleMoveTo(enemypos);
 		}
@@ -229,9 +224,15 @@ public class Yukihime extends AdvancedRobot {
 		enemypos = getRelativePosition(e);
 		
 		//out.println("Eneymy is moving: " + isMoving(getAbsolutePosition(e)));
-		if(getEnergy() > 50)
+		if(getEnergy() > 25 || e.getEnergy() < getEnergy())
 		{
-			//enemyTarget = shootEnemy(e);
+			if(!isMoving(getAbsolutePosition(e)))
+			{
+				shootEnemy(e);
+				shootEnemy(e);
+				shootEnemy(e);
+			}
+			enemyTarget = shootEnemy(e);
 		}
 	}
 
