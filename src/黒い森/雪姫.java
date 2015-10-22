@@ -1,4 +1,4 @@
-package kuroimori;
+package 黒い森;
 
 import java.awt.Graphics2D;
 import java.util.Random;
@@ -11,7 +11,7 @@ import robocode.util.Utils;
 
 import static robocode.util.Utils.*;
 
-public class Yukihime extends AdvancedRobot {
+public class 雪姫 extends AdvancedRobot {
 
 	/* TODO: enemypos -> relativeEnemeyPos */
 	private double[] enemypos;
@@ -45,7 +45,7 @@ public class Yukihime extends AdvancedRobot {
 
 	/**
 	 * Get Relative Position (Vector) of an Enemy by (sin a, cos a) * |w|
-	 * 
+	 *
 	 * @param enemy
 	 * @return coordiantes of enemy
 	 */
@@ -63,7 +63,7 @@ public class Yukihime extends AdvancedRobot {
 	}
 	/**
 	 * Get Absolute Position by Relative
-	 * 
+	 *
 	 * @param enemy
 	 * @return coordinates
 	 */
@@ -79,7 +79,7 @@ public class Yukihime extends AdvancedRobot {
 	/**
 	 * True if scanned enemy is moving
 	 * Attention! scanning is done outside!
-	 * 
+	 *
 	 * @param enemy - Scanned enemy
 	 * @return state
 	 */
@@ -115,7 +115,7 @@ public class Yukihime extends AdvancedRobot {
 
 	/**
 	 * Move in a "stairy" way...
-	 * 
+	 *
 	 * @param coordinates
 	 */
 	public void angleMoveTo(double[] coordinates)
@@ -133,18 +133,18 @@ public class Yukihime extends AdvancedRobot {
 			turnLeft(90);
 		}
 	}
-	
+
 	/**
 	 * Allways tries to locate an enemy on the Map
 	 * @param e
 	 */
 	public void turnRadarToEnemy(ScannedRobotEvent e)
 	{
-		double currradar = getRadarHeadingRadians(); 
+		double currradar = getRadarHeadingRadians();
 		setTurnRadarRightRadians(0);
 	}
-	
-	
+
+
 	/**
 	 * Finds an Enemy and tries to shoot at hime while he is moving
 	 * @param e Enemy Scanned Obj
@@ -152,23 +152,23 @@ public class Yukihime extends AdvancedRobot {
 	 */
 	public double[] shootEnemy(ScannedRobotEvent e)
 	{
-		double bulletVelocity = 20 - 3 * bulletStrength; 
+		double bulletVelocity = 20 - 3 * bulletStrength;
 		double enemydis = e.getDistance();
 
-		
+
 		double enemyVelocity = e.getVelocity();
 		double enemyHeading = e.getHeadingRadians();
-		
+
 		double velocity_x = enemyVelocity*sin(enemyHeading);
 		double velocity_y = enemyVelocity*cos(enemyHeading);
-		
+
 		double timeConsume = enemydis/bulletVelocity;
-		
+
 		double[] enemyPos = getAbsolutePosition(e);
-		
+
 		double newenemyx = enemyPos[0]+(timeConsume*velocity_x);
 		double newenemyy = enemyPos[1]+(timeConsume*velocity_y);
-		
+
 		if(newenemyx > getBattleFieldWidth())
 		{
 			newenemyx = getBattleFieldWidth();
@@ -177,7 +177,7 @@ public class Yukihime extends AdvancedRobot {
 		{
 			newenemyx = 0;
 		}
-		
+
 		if(newenemyy > getBattleFieldHeight())
 		{
 			newenemyy = getBattleFieldHeight();
@@ -186,19 +186,19 @@ public class Yukihime extends AdvancedRobot {
 		{
 			newenemyy = 0;
 		}
-		
+
 		//Turn myself by -> Change to turn gun to [tan((getX() - newenemyx) / (getY() - newenemyy))]
 		double turn = normalRelativeAngle(atan2((getX() - newenemyx), (getY() - newenemyy)) - getGunHeadingRadians() - PI);
 		out.println("TurnBy: " + turn);
 		setTurnGunRightRadians(turn);
 		setFire(bulletStrength);
-		
-		double[] newpos = {newenemyx, newenemyy};  
+
+		double[] newpos = {newenemyx, newenemyy};
 
 		//setTurnRadarRight(360);
 		return newpos;
 	}
-	
+
 	public void run()
 	{
 		//FIXME: Change Back to normal
@@ -219,11 +219,11 @@ public class Yukihime extends AdvancedRobot {
 	public void onScannedRobot(ScannedRobotEvent e)
 	{
 		double radarTurn = getHeadingRadians() + e.getBearingRadians() - getRadarHeadingRadians();
-		 
+
 		setTurnRadarRightRadians(Utils.normalRelativeAngle(radarTurn));
-		
+
 		enemypos = getRelativePosition(e);
-		
+
 		//out.println("Eneymy is moving: " + isMoving(getAbsolutePosition(e)));
 		if(getEnergy() > 25 || e.getEnergy() < getEnergy())
 		{
