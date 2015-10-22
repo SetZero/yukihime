@@ -18,15 +18,16 @@ public class Yukihime extends AdvancedRobot {
 
 	private double[] prevEnemyPos = {-1, -1};
 	//Stair Steps
-	private final int steps = 2;
+	private final int steps = 4;
 
 	private double[] enemyTarget;
-	private int enemycountercampshots = 10;
+	private int enemycountercampshots = 3;
 	private double bulletStrength = 1.01;
 	public double eenergy;
-	public double FORWARD = 10;
+	public double FORWARD = 1;
 	public int firetime = 0;
 	private int wallMargin = 60; 
+	private int firstHit = 0;
 	
 
 	/**
@@ -132,10 +133,37 @@ public class Yukihime extends AdvancedRobot {
 
 		for(int i=0;i<steps;i++)
 		{
-			ahead(coordinates[1]/steps);
-			turnRight(90);
-			ahead(coordinates[0]/steps);
-			turnLeft(90);
+			if(!nearWall())
+			{
+				ahead(coordinates[1]/steps);
+				turnRight(90);
+				ahead(coordinates[0]/steps);
+				turnLeft(90);
+			}
+			else
+			{
+				out.println("WALL HIT");
+				if(getX() <= wallMargin)
+				{
+					setTurnRight(normalRelativeAngleDegrees(90 - getHeading()));
+					setAhead(50);
+				}
+				else if(getX() >= getBattleFieldWidth() - wallMargin)
+				{
+					setTurnRight(normalRelativeAngleDegrees(90 - getHeading()));
+					setAhead(-50);
+				}
+				else if(getY() <= wallMargin)
+				{
+					setTurnRight(normalRelativeAngleDegrees(0 - getHeading()));
+					setAhead(-50);					
+				}
+				else if(getY() >= getBattleFieldHeight() - wallMargin)
+				{
+					setTurnRight(normalRelativeAngleDegrees(0 - getHeading()));
+					setAhead(-50);					
+				}
+			}
 		}
 	}
 	
@@ -210,7 +238,8 @@ public class Yukihime extends AdvancedRobot {
 		setup();
 		//Full Enviorment Scan
 		turnRadarRightRadians(Double.POSITIVE_INFINITY);
-		angleMoveTo(enemypos);
+		double[] moveDirrection = {0, 0};
+		angleMoveTo(moveDirrection);
 		
 		while(true)
 		{
@@ -219,6 +248,19 @@ public class Yukihime extends AdvancedRobot {
 		}
 	}
 
+	public boolean nearWall()
+	{
+		if((getX() <= wallMargin ||
+			getX() >= getBattleFieldWidth() - wallMargin ||
+			getY() <= wallMargin ||
+			getY() >= getBattleFieldHeight() - wallMargin
+		  ))
+		{
+			return true;
+		}
+		return false;
+	}
+	
 	/**
 	 * @brief Move to Enemy
 	 */
@@ -230,34 +272,55 @@ public class Yukihime extends AdvancedRobot {
 		
 		enemypos = getRelativePosition(e);
 		
-		if(getEnergy() < 99)
+		if(getEnergy() < 70 || firstHit > 2)
 		{
-			if((getX() <= wallMargin ||
-				 getX() >= getBattleFieldWidth() - wallMargin ||
-				 getY() <= wallMargin ||
-				 getY() >= getBattleFieldHeight() - wallMargin)
-				)
-				{
+			if(nearWall())
+			{
 					FORWARD = -FORWARD; 	
-					setAhead(FORWARD*wallMargin);
-				}
-			double b;
-			b = eenergy - e.getEnergy(); 
-			eenergy = e.getEnergy();
-			//MOVE
-			if (b > 0 && b <= 3) { 
-			 	firetime = (int) (10+2*b);
-			 	setMaxVelocity(8);
-			 	if (Math.random() < 0.5) FORWARD = -FORWARD; 
-				setAhead(185 * FORWARD); 
+					out.println("WALL HIT");
+					if(getX() <= wallMargin)
+					{
+						turnRight(normalRelativeAngleDegrees(90 - getHeading()));
+						setAhead(100);
+					}
+					else if(getX() >= getBattleFieldWidth() - wallMargin)
+					{
+						turnRight(normalRelativeAngleDegrees(90 - getHeading()));
+						setAhead(-100);
+					}
+					else if(getY() <= wallMargin)
+					{
+						turnRight(normalRelativeAngleDegrees(0 - getHeading()));
+						setAhead(-100);					
+					}
+					else if(getY() >= getBattleFieldHeight() - wallMargin)
+					{
+						turnRight(normalRelativeAngleDegrees(0 - getHeading()));
+						setAhead(-100);					
+					}
 			}
-			if (getDistanceRemaining() == 0) { FORWARD = -FORWARD; setAhead(185 * FORWARD); }
-			if (--firetime == 3 && Math.random() <0.5) setMaxVelocity(4); 
-			setTurnRightRadians(e.getBearingRadians() + Math.PI/2 - 0.5236 * FORWARD * (e.getDistance() > 200 ? 1 : -1));
+			else
+			{
+				double b;
+				b = eenergy - e.getEnergy(); 
+				eenergy = e.getEnergy();
+				//MOVE
+				if (b > 0 && b <= 3) { 
+				 	firetime = (int) (10+2*b);
+				 	setMaxVelocity(8);
+				 	if (random() < 0.5) FORWARD = -FORWARD; 
+					setAhead(185 * FORWARD); 
+				}
+				if (getDistanceRemaining() == 0) { FORWARD = -FORWARD; setAhead(185 * FORWARD); }
+				if (--firetime == 3 && random() <0.5) setMaxVelocity(4);  
+				setTurnRightRadians(e.getBearingRadians() + PI/2 - 0.5236 * FORWARD * (e.getDistance() > 200 ? 1 : -1));
+
+				firstHit = 0;
+			}
 		}
 		
 		//out.println("Eneymy is moving: " + isMoving(getAbsolutePosition(e)));
-		if(getEnergy() > 25 || e.getEnergy() < getEnergy())
+		if(getEnergy() > 3 || e.getEnergy() < getEnergy())
 		{
 			
 			if(!isMoving(getAbsolutePosition(e)))
@@ -278,7 +341,8 @@ public class Yukihime extends AdvancedRobot {
 			}
 			else
 			{
-				bulletStrength = 1.01;
+				bulletStrength = e.getDistance()/(sqrt(pow(getBattleFieldWidth(), 2)*pow(getBattleFieldHeight(), 2)))*3;
+				//bulletStrength = 1.01;
 			}
 			enemyTarget = shootEnemy(e);
 		}
@@ -286,7 +350,8 @@ public class Yukihime extends AdvancedRobot {
 
 	public void onHitByBullet(HitByBulletEvent event)
 	{
-
+		
+		firstHit++;
 		Random rand = new Random();
 		enemypos[0] = (double)rand.nextInt((int)getBattleFieldHeight());
 		enemypos[1] = (double)rand.nextInt((int)getBattleFieldWidth());
