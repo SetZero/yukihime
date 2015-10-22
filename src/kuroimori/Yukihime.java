@@ -21,6 +21,8 @@ public class Yukihime extends AdvancedRobot {
 	private final int steps = 2;
 
 	private double[] enemyTarget;
+	private int enemycountercampshots = 10;
+	private double bulletStrength = 1;
 
 	/**
 	 * Setup every variable for a map overview
@@ -150,7 +152,6 @@ public class Yukihime extends AdvancedRobot {
 	 */
 	public double[] shootEnemy(ScannedRobotEvent e)
 	{
-		double bulletStrength = 1;
 		double bulletVelocity = 20 - 3 * bulletStrength; 
 		double enemydis = e.getDistance();
 
@@ -228,9 +229,15 @@ public class Yukihime extends AdvancedRobot {
 		{
 			if(!isMoving(getAbsolutePosition(e)))
 			{
-				shootEnemy(e);
-				shootEnemy(e);
-				shootEnemy(e);
+				bulletStrength = 3;
+				for(int i=0;i<enemycountercampshots;i++)
+				{
+					shootEnemy(e);
+				}
+			}
+			else
+			{
+				bulletStrength = 1;
 			}
 			enemyTarget = shootEnemy(e);
 		}
