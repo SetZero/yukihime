@@ -234,7 +234,6 @@ public class 雪姫 extends AdvancedRobot {
 
 	public void run()
 	{
-		//FIXME: Change Back to normal
 		setup();
 		//Full Enviorment Scan
 		turnRadarRightRadians(Double.POSITIVE_INFINITY);
@@ -267,14 +266,15 @@ public class 雪姫 extends AdvancedRobot {
 	public void onScannedRobot(ScannedRobotEvent e)
 	{
 		double radarTurn = getHeadingRadians() + e.getBearingRadians() - getRadarHeadingRadians();
+		double minx;
 
 		setTurnRadarRightRadians(Utils.normalRelativeAngle(radarTurn));
 
 		enemypos = getRelativePosition(e);
 
-		if(getEnergy() < 70 || firstHit > 2)
+		if(getEnergy() < 100)
 		{
-			if(nearWall())
+			/*if(nearWall())
 			{
 					FORWARD = -FORWARD;
 					out.println("WALL HIT");
@@ -300,7 +300,7 @@ public class 雪姫 extends AdvancedRobot {
 					}
 			}
 			else
-			{
+			{*/
 				double b;
 				b = eenergy - e.getEnergy();
 				eenergy = e.getEnergy();
@@ -314,9 +314,7 @@ public class 雪姫 extends AdvancedRobot {
 				if (getDistanceRemaining() == 0) { FORWARD = -FORWARD; setAhead(185 * FORWARD); }
 				if (--firetime == 3 && random() <0.5) setMaxVelocity(4);
 				setTurnRightRadians(e.getBearingRadians() + PI/2 - 0.5236 * FORWARD * (e.getDistance() > 200 ? 1 : -1));
-
-				firstHit = 0;
-			}
+			//}
 		}
 
 		//out.println("Eneymy is moving: " + isMoving(getAbsolutePosition(e)));
@@ -341,8 +339,24 @@ public class 雪姫 extends AdvancedRobot {
 			}
 			else
 			{
-				bulletStrength = e.getDistance()/(sqrt(pow(getBattleFieldWidth(), 2)*pow(getBattleFieldHeight(), 2)))*3;
-				//bulletStrength = 1.01;
+				//bulletStrength = (e.getDistance()/(sqrt(pow(getBattleFieldWidth(), 2)*pow(getBattleFieldHeight(), 2))))*3;
+				if(getBattleFieldWidth() > getBattleFieldHeight())
+				{
+					minx = getBattleFieldWidth();
+				}
+				else
+				{
+					minx = getBattleFieldHeight();
+				}
+				
+				if(e.getDistance() < minx/2)
+				{
+					bulletStrength = 3;
+				}
+				else
+				{
+					bulletStrength = 1.01;
+				}
 			}
 			enemyTarget = shootEnemy(e);
 		}
@@ -350,8 +364,6 @@ public class 雪姫 extends AdvancedRobot {
 
 	public void onHitByBullet(HitByBulletEvent event)
 	{
-
-		firstHit++;
 		Random rand = new Random();
 		enemypos[0] = (double)rand.nextInt((int)getBattleFieldHeight());
 		enemypos[1] = (double)rand.nextInt((int)getBattleFieldWidth());
